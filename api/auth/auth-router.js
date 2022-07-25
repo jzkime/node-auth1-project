@@ -10,7 +10,7 @@ router.post('/register', checkPasswordLength, checkUsernameFree, (req, res, next
   const { username, password } = req.body;
   const hashPW = bcrypt.hashSync(password, 12);
   userMod.add({username, password: hashPW})
-    .then(() => res.status(201).json({message: `Welcome new user, ${username}!`}))
+    .then(user => res.status(201).json(user))
     .catch(next);
 })
 /**
@@ -36,7 +36,15 @@ router.post('/register', checkPasswordLength, checkUsernameFree, (req, res, next
   }
  */
 
-
+router.post('/login', checkUsernameExists, async (req, res, next) => {
+  const { username, password } = req.user;
+  if(!bcrypt.compareSync(req.body.password, password)) {
+    next({status: 401, message: "Invalid credentials"})
+    return;
+    }
+  req.session.user = req.user;
+  res.json({message: `Welcome ${username}!`})
+})
 /**
   2 [POST] /api/auth/login { "username": "sue", "password": "1234" }
 
@@ -53,6 +61,16 @@ router.post('/register', checkPasswordLength, checkUsernameFree, (req, res, next
   }
  */
 
+router.get('/logout', (req, res, next) => {
+  if(req.session.user) {
+    req.session.destroy(err => {
+      if(err) return next({message: "error in destroying cookie"})
+        else return res.json({message: "logged out"})
+    })
+  } else {
+    res.json({message: "no session"})
+  }
+})
 
 /**
   3 [GET] /api/auth/logout

@@ -32,6 +32,7 @@ function findById(user_id) {
 function add(user) {
   return db('users')
     .insert(user)
+    .then(arrId => findById(arrId[0]))
 }
 
 // Don't forget to add these to the `exports` object so they can be required in other modules

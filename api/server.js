@@ -17,15 +17,15 @@ const cors = require("cors");
 
 const session = require('express-session');
 const sessionConfig = {
-  name: "u4-session-name",
-  secret: 'totally-secret-pw',
+  name: "chocolatechip",
+  secret: "totally-secret-pw",
   cookie: {
     maxAge: 1000 * 60 * 10,
     secure: false, // not current production
     httpOnly: true
   },
   resave: false,
-  saveUnitialized: false
+  saveUninitialized: false
 }
 
 const server = express();
