@@ -11,15 +11,35 @@ const cors = require("cors");
   Users that do authenticate should have a session persisted on the server,
   and a cookie set on the client. The name of the cookie should be "chocolatechip".
 
-  The session can be persisted in memory (would not be adecuate for production)
+  The session can be persisted in memory (would not be adequate for production)
   or you can use a session store like `connect-session-knex`.
  */
 
+const session = require('express-session');
+const sessionConfig = {
+  name: "u4-session-name",
+  secret: 'totally-secret-pw',
+  cookie: {
+    maxAge: 1000 * 60 * 10,
+    secure: false, // not current production
+    httpOnly: true
+  },
+  resave: false,
+  saveUnitialized: false
+}
+
 const server = express();
+
+server.use(session(sessionConfig))
 
 server.use(helmet());
 server.use(express.json());
 server.use(cors());
+
+const userRouter = require('./users/users-router');
+const authRouter = require('./auth/auth-router');
+server.use('/api/users', userRouter);
+server.use('/api/auth', authRouter);
 
 server.get("/", (req, res) => {
   res.json({ api: "up" });
